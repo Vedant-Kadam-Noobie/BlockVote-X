@@ -39,17 +39,17 @@ contract Ballot {
     
     
 	modifier condition(bool _condition) {
-		require(_condition);
+		require(_condition, "Condition not met");
 		_;
 	}
 
 	modifier onlyOfficial() {
-		require(msg.sender ==ballotOfficialAddress);
+		require(msg.sender ==ballotOfficialAddress, "Only the ballot official can perform this action");
 		_;
 	}
 
 	modifier inState(State _state) {
-		require(state == _state);
+		require(state == _state, "Invalid state for this operation");
 		_;
 	}
 
@@ -117,4 +117,13 @@ contract Ballot {
         finalResult = countResult; //move result from private countResult to public finalResult
         emit voteEnded(finalResult);
     }
+
+    // Retrieve voting result (only callable when voting has ended)
+    function getVoteResult() public view inState(State.Ended) returns (uint yesVotes, uint noVotes) {
+        noVotes = totalVote - countResult; // Calculate no votes
+        return (countResult, noVotes);
+    }
+
 }
+
+    
